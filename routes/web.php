@@ -6,7 +6,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-route::post('/players', [PlayerController::class, 'create'])->name('players.create');
+route::post('/players', [PlayerController::class, 'create']);
+var_dump("hola");
 route::put('/players/{id}', [PlayerController::class, 'edit'])->name('players.edit');
 route::post('/players/{id}/games/', [PlayerController::class, 'createDice'])->name('players.createDice');
 route::delete('/players/{id}/games', [PlayerController::class, 'deleteDice'])->name('players.deleteDice');

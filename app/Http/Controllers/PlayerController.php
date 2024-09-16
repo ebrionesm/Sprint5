@@ -22,7 +22,9 @@ class PlayerController extends Controller
      */
     public function create()
     {
-        //
+        
+        //store($request);
+
     }
 
     public function createDice(Player $player)
@@ -36,6 +38,15 @@ class PlayerController extends Controller
     public function store(StorePlayerRequest $request)
     {
         //
+        $request->validate([
+            'nickname' => 'required|string|min:3|max:25'
+        ]);
+
+        $player = new Player;
+
+        $player->nickname = $request->nickname;
+
+        $player->save();
     }
 
     /**
