@@ -25,6 +25,11 @@ class PlayerController extends Controller
         //
     }
 
+    public function createDice(Player $player)
+    {
+
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -41,6 +46,31 @@ class PlayerController extends Controller
         //
     }
 
+    public function showPlayers()
+    {
+
+    }
+
+    public function showDice(Player $player)
+    {
+
+    }
+
+    public function showRanking()
+    {
+
+    }
+
+    public function showWorst()
+    {
+
+    }
+
+    public function showBest()
+    {
+        
+    }
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -55,6 +85,11 @@ class PlayerController extends Controller
     public function update(UpdatePlayerRequest $request, Player $player)
     {
         //
+    }
+
+    public function deleteDice(Player $player)
+    {
+
     }
 
     /**
