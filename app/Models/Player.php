@@ -11,7 +11,7 @@ use Laravel\Passport\HasApiTokens;
 class Player extends Authenticatable
 {
 
-    use HasFactory, Notifiable, HasApiTokens, HasRoles;
+    use HasFactory, Notifiable, HasApiTokens/*, HasRoles*/;
 
     protected $fillable = ["nickname", "email", "password", "role"];
     /**

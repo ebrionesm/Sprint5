@@ -4,10 +4,11 @@ namespace App\Http\Controllers\API;
      
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
-use App\Models\User;
+use App\Models\Player;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\Rule;
      
 class RegisterController extends BaseController
 {
@@ -19,8 +20,17 @@ class RegisterController extends BaseController
     public function register(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'nickname' => 'required',
-            'email' => 'required|email',
+            'nickname' => 
+                [
+                    'nullable', /*Rule::unique('players')->where(fn (Builder $query) => $query->where('nickname', 'Anónimo')),*/ 'max:25'
+                ],
+            'email' => 
+                [
+                    'required',
+                    //Rule::unique('players')->ignore($player->id),
+                    'email'
+                ],
+
             'role'=>'required',
             'password' => 'required',
             /*'c_password' => 'required|same:password',*/
@@ -32,11 +42,11 @@ class RegisterController extends BaseController
      
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
-        $user = User::create($input);
-        $success['token'] =  $user->createToken('MyApp')->accessToken;
-        $success['name'] =  $user->name;
+        $player = Player::create($input);
+        $success['token'] =  $player->createToken('dicegame')->accessToken;
+        $success['name'] =  $player->nickname;
    
-        return $this->sendResponse($success, 'User register successfully.');
+        return $this->sendResponse($success, 'Player registered successfully.');
     }
      
     /**
@@ -47,11 +57,11 @@ class RegisterController extends BaseController
     public function login(Request $request): JsonResponse
     {
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
-            $user = Auth::user(); 
-            $success['token'] =  $user->createToken('MyApp')-> accessToken; 
-            $success['name'] =  $user->name;
+            $player = Auth::user(); 
+            $success['token'] =  $player->createToken('dicegame')-> accessToken; 
+            $success['name'] =  $player->nickname;
    
-            return $this->sendResponse($success, 'User login successfully.');
+            return $this->sendResponse($success, 'Player login successfully.');
         } 
         else{ 
             return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
