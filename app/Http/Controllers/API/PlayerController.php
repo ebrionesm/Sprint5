@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use App\Models\Player;
 use App\Http\Controllers\Controller;
@@ -20,9 +20,11 @@ class PlayerController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public static function create()
     {
-        //
+        //store($request);
+        var_dump("create");
+        return 5;
     }
 
     public function createDice(Player $player)
@@ -36,6 +38,16 @@ class PlayerController extends Controller
     public function store(StorePlayerRequest $request)
     {
         //
+        $request->validate([
+            'nickname' => 'required|string|min:3|max:25',
+            'email'
+        ]);
+
+        $player = new Player;
+
+        $player->nickname = $request->nickname;
+
+        $player->save();
     }
 
     /**

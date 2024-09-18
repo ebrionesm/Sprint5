@@ -16,10 +16,15 @@ return new class extends Migration
             $table->integer('dieOne');
             $table->integer('dieTwo');
             $table->boolean('victory');
-            $table->unsignedInteger('id_player');
-            $table->timestamps();
+            $table->unsignedBigInteger('id_player');
+            
 
-            $table->foreign('id_player')->references('id')->on('players')->onDelete('cascade');
+            $table->foreign('id_player')
+            ->references('id')
+            ->on('players')
+            ->onDelete('cascade');
+
+            $table->timestamps();
         });
     }
 
