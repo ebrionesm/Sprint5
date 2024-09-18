@@ -6,6 +6,7 @@ use App\Models\Player;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePlayerRequest;
 use App\Http\Requests\UpdatePlayerRequest;
+use Illuminate\Http\Request;
 
 class PlayerController extends Controller
 {
@@ -86,9 +87,25 @@ class PlayerController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Player $player)
+    public function edit(Request $request, $id)
     {
-        //
+        echo "AAAA";
+        // Buscar el jugador por su ID
+        $player = Player::findOrFail($id);
+
+        // Validar y actualizar los datos del jugador
+        $validatedData = $request->validate([
+            'nickname' => 'required|string|max:255',
+        ]);
+
+        // Actualizar los campos
+        $player->update($validatedData);
+
+        // Retornar una respuesta de éxito
+        return response()->json([
+            'message' => 'Player updated successfully',
+            'player' => $player,
+        ], 200);
     }
 
     /**
