@@ -10,7 +10,7 @@ use App\Http\Controllers\API\ProductController;
     return $request->user();
 })->middleware('auth:passport');*/
 
-Route::post('register', [RegisterController::class, 'register']);
+Route::post('/players', [RegisterController::class, 'register']);
 Route::post('login', [RegisterController::class, 'login']);
 
 Route::middleware('auth:api')->group( function()
@@ -27,4 +27,4 @@ Route::middleware('auth:api')->group( function()
     
 });
 
-route::post('/players', [PlayerController::class, 'create']);
+//route::post('/players', [PlayerController::class, 'create']);
