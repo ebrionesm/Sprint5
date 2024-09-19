@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Player;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\GameController;
 use App\Http\Requests\StorePlayerRequest;
 use App\Http\Requests\UpdatePlayerRequest;
 use Illuminate\Http\Request;
@@ -29,9 +30,12 @@ class PlayerController extends Controller
         return 5;
     }
 
-    public function createDice(Player $player)
+    public function createDice(int $id)
     {
-
+        $gameController = new GameController();
+        $response = $gameController->create($id);
+        return response()->json(['response' => $response]);
+        //GameController::create($id);
     }
 
     /**
