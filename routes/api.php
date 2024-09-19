@@ -19,7 +19,7 @@ Route::middleware('auth:api')->group( function()
     route::get('/players/ranking', [PlayerController::class, 'showRanking'])->name('players.showRanking');
     route::get('/players/ranking/loser', [PlayerController::class, 'showWorst'])->name('players.showWorst');
     route::get('/players/ranking/winner', [PlayerController::class, 'showBest'])->name('players.showBest');
-    route::put('/players/{id}', [PlayerController::class, 'edit'])->name('players.edit');
+    route::put('/players/{id}', [PlayerController::class, 'update'])->name('players.update');
     route::post('/players/{id}/games/', [PlayerController::class, 'createDice'])->name('players.createDice');
     route::delete('/players/{id}/games', [PlayerController::class, 'deleteDice'])->name('players.deleteDice');
     route::get('/players', [PlayerController::class, 'showPlayers'])->name('players.showPlayers');

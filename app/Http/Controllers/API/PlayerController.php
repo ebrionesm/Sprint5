@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePlayerRequest;
 use App\Http\Requests\UpdatePlayerRequest;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PlayerController extends Controller
 {
@@ -41,7 +42,9 @@ class PlayerController extends Controller
         //
         $request->validate([
             'nickname' => 'required|string|min:3|max:25',
-            'email'
+            'email' => 'required|string',
+            'password' => 'required|string',
+            'role' => ['required', Rule::in(['admin', 'player'])],
         ]);
 
         $player = new Player;
@@ -89,31 +92,45 @@ class PlayerController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        echo "AAAA";
+        
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, int $id)
+    {
+        //return response()->json(['id' => $id]);
+        
         // Buscar el jugador por su ID
-        $player = Player::findOrFail($id);
+        $player = Player::find($id);
+        //return response()->json(['playerNickname' => $request->input('nickname')]);
 
         // Validar y actualizar los datos del jugador
         $validatedData = $request->validate([
-            'nickname' => 'required|string|max:255',
+            'nickname' => 'required|string|min:3|max:25',
+            /*'email' => 'required|string',
+            'password' => 'required|string',
+            'role' => 'required', /*Rule::in(['admin', 'player'])],*/
         ]);
+        
+
+        if (!$player) 
+        {
+            return response()->json(['message' => 'Player not found'], 404);
+        }
+
+        
 
         // Actualizar los campos
-        $player->update($validatedData);
+        $player->nickname = $validatedData['nickname'];
+        $player->save();
 
         // Retornar una respuesta de éxito
         return response()->json([
             'message' => 'Player updated successfully',
             'player' => $player,
         ], 200);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePlayerRequest $request, Player $player)
-    {
-        //
     }
 
     public function deleteDice(Player $player)
