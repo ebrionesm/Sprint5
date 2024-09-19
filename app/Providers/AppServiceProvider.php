@@ -3,8 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Pagination\Paginator;
+//use Illuminate\Support\Facades\Gate;
+//use Illuminate\Pagination\Paginator;
+use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,10 +22,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::before(function ($player, $ability) {
+        /*Gate::before(function ($player, $ability) {
             return $player->hasRole('Super Admin') ? true : null;
         });
         
-        Paginator::useBootstrapFive();
+        Paginator::useBootstrapFive();*/
+        /*$this->registerPolicies();
+        Passport::routes();*/
+        Passport::enablePasswordGrant();
     }
 }
