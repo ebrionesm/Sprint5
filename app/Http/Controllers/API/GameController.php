@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use App\Models\Game;
 use App\Http\Controllers\Controller;
@@ -20,9 +20,34 @@ class GameController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(int $id)
     {
-        //
+        $dieOne = rand(1, 6);
+        $dieTwo = rand(1, 6);
+        //echo $dieOne;
+        //echo $dieTwo;
+        if($dieOne + $dieTwo === 7)
+        {
+            $victory = true;
+        }
+        else
+        {
+            $victory = false;
+        }
+
+        $game = new Game();
+
+        $game->dieOne = $dieOne;
+        $game->dieTwo = $dieTwo;
+        $game->victory = $victory;
+        $game->id_player = $id;
+
+        $game->created_at = date('Y-m-d H:i:s');
+
+        $game->save();
+        //echo $victory;
+
+        return response()->json(['dieOne' => $dieOne, 'dieTwo' => $dieTwo, 'result' => $victory]);
     }
 
     /**
@@ -55,6 +80,13 @@ class GameController extends Controller
     public function update(UpdateGameRequest $request, Game $game)
     {
         //
+    }
+
+    public function delete(int $id)
+    {
+        Game::where('id_player', $id)->delete();
+
+        //$decks = DB::table('deck')->get();
     }
 
     /**

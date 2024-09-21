@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Player;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\GameController;
 use App\Http\Requests\StorePlayerRequest;
 use App\Http\Requests\UpdatePlayerRequest;
 use Illuminate\Http\Request;
@@ -29,9 +30,12 @@ class PlayerController extends Controller
         return 5;
     }
 
-    public function createDice(Player $player)
+    public function createDice(int $id)
     {
-
+        $gameController = new GameController();
+        $response = $gameController->create($id);
+        return response()->json(['response' => $response]);
+        //GameController::create($id);
     }
 
     /**
@@ -103,8 +107,27 @@ class PlayerController extends Controller
         //return response()->json(['id' => $id]);
         
         // Buscar el jugador por su ID
-        $player = Player::find($id);
+        //$player = Player::find($id);
         //return response()->json(['playerNickname' => $request->input('nickname')]);
+
+        $player = Player::find($id);
+
+        if (!$player) 
+        {
+            return response()->json(['message' => 'Player not found'], 404);
+        }
+        //dd(json_decode($request->getContent(), true));
+        // Obtener el valor de 'nickname' del request
+        //return response()->json(['request' => $request]);
+        //$nickname = $request->input('nickname');
+        $nickname = $request->json('nickname');
+        
+
+        // Si el valor de nickname no es proporcionado
+        if (!$nickname) 
+        {
+            return response()->json(['message' => 'Nickname is required'], 400);
+        }
 
         // Validar y actualizar los datos del jugador
         $validatedData = $request->validate([
@@ -133,9 +156,11 @@ class PlayerController extends Controller
         ], 200);
     }
 
-    public function deleteDice(Player $player)
+    public function deleteDice(int $id)
     {
-
+        $gameController = new GameController();
+        $gameController->delete($id);
+        return response()->json(['response' => "All rows deleted"]);
     }
 
     /**
