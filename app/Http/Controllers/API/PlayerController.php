@@ -68,7 +68,7 @@ class PlayerController extends Controller
 
     public function showPlayers()
     {
-
+        return Player::all();
     }
 
     public function showDice(Player $player)

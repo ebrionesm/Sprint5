@@ -18,6 +18,7 @@ class PermissionSeeder extends Seeder
             'edit-player',
             'delete-player',*/
             'edit-player',
+            'view-player',
             'view-game',
             'create-game',
             'delete-games',
