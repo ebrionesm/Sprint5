@@ -58,12 +58,31 @@ class GameController extends Controller
         //
     }
 
+    public function getAllGamesFromPlayer(int $id)
+    {
+        if(Game::where('id_player', '=', $id)->count() > 0)
+        {
+            $totalWins = Game::where('id_player', '=', $id)->where('victory', '=', '1')->count();
+            $totalGames = Game::where('id_player', '=', $id)->count();
+        }
+        
+        return Game::where('id_player', '=', $id)->count() > 0 ? ($totalWins/$totalGames) * 100 : "-";
+    }
+
+
     /**
      * Display the specified resource.
      */
-    public function show(Game $game)
+    public function show(int $id)
     {
-        //
+        $games = Game::where('id_player', '=', $id)->get();
+
+        return response()->json([$games]);
+    }
+
+    public function getTotalPlayersWithGames()
+    {
+        return Game::distinct('id_player')->count('id_player');
     }
 
     /**
