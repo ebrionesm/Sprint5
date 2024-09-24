@@ -14,14 +14,18 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         Role::create(['name' => 'Super Admin']);
-        $admin = Role::create(['name' => 'Admin']);
-        $player = Role::create(['name' => 'Player']);
+        $admin = Role::create(['name' => 'admin']);
+        $player = Role::create(['name' => 'player']);
 
         $admin->givePermissionTo([
-            /*'create-player',
             'edit-player',
-            'delete-player',*/
-            'delete-games'
+            'view-game',
+            'create-game',
+            'view-ranking',
+            'view-worst',
+            'view-best',
+            'delete-games',
+            'view-player'
         ]);
 
         $player->givePermissionTo([
