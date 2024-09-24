@@ -18,8 +18,8 @@ Route::post('login', [RegisterController::class, 'login']);
 Route::middleware('auth:api')->group( function()
 {
     
-    route::get('/players/ranking', [PlayerController::class, 'showRanking'])->name('players.showRanking');
-    route::get('/players/ranking/loser', [PlayerController::class, 'showWorst'])->name('players.showWorst');
+    //route::get('/players/ranking', [PlayerController::class, 'showRanking'])->name('players.showRanking');
+    //route::get('/players/ranking/loser', [PlayerController::class, 'showWorst'])->name('players.showWorst');
     route::get('/players/ranking/winner', [PlayerController::class, 'showBest'])->name('players.showBest');
     route::put('/players/{id}', [PlayerController::class, 'update'])->name('players.update');
     route::post('/players/{id}/games/', [PlayerController::class, 'createDice'])->name('players.createDice');
@@ -28,9 +28,20 @@ Route::middleware('auth:api')->group( function()
     route::get('/players/{id}/games', [PlayerController::class, 'showDice'])->name('players.showDice');
 
     Route::get('/players', [PlayerController::class, 'showPlayers'])
-        ->middleware('role:admin')  // Middleware de Spatie para restringir a admin
+        ->middleware('role:admin')
         ->name('players.showPlayers');
     
+    Route::get('/players/ranking', [PlayerController::class, 'showRanking'])
+        ->middleware('role:admin')
+        ->name('players.showRanking');
+
+    Route::get('/players/ranking/loser', [PlayerController::class, 'showWorst'])
+        ->middleware('role:admin')
+        ->name('players.showWorst');
+
+    Route::get('/players/ranking/winner', [PlayerController::class, 'showBest'])
+        ->middleware('role:admin')
+        ->name('players.showBest');
 });
 
 //route::post('/players', [PlayerController::class, 'create']);

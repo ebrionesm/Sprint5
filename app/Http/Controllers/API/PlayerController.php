@@ -32,6 +32,12 @@ class PlayerController extends Controller
 
     public function createDice(int $id)
     {
+        $authenticatedPlayer = auth()->user();
+
+        if ($authenticatedPlayer->id != $id) {
+            return response()->json(['error' => 'Access to other player denied.'], 403);
+        }
+
         $gameController = new GameController();
         $response = $gameController->create($id);
         return response()->json(['response' => $response]);
@@ -68,27 +74,84 @@ class PlayerController extends Controller
 
     public function showPlayers()
     {
-        return Player::all();
+        $gameController = new GameController();
+        $playerVictoryPct = [];
+        foreach(Player::all() as $player)
+        {
+            $victoriesPercentage = $gameController->getAllGamesFromPlayer($player->id);
+            $playerVictoryPct[$player->nickname] = $victoriesPercentage . '%';
+            //echo $victoriesPercentage . " ";
+        }
+        
+        return json_encode($playerVictoryPct);
     }
 
-    public function showDice(Player $player)
+    public function showDice(int $id)
     {
+        $authenticatedPlayer = auth()->user();
 
+        if ($authenticatedPlayer->id != $id) {
+            // Comprobar si el usuario autenticado es un administrador
+            if (!$authenticatedPlayer->hasRole('admin')) { // Usa el método correspondiente según tu implementación de roles
+                return response()->json(['error' => 'Access to other player denied.'], 403);
+            }
+        }
+
+        $gameController = new GameController();
+
+        $games = $gameController->show($id);
+
+        return json_encode($games);
+        
     }
 
     public function showRanking()
     {
+        $gameController = new GameController();
+        $victoriesPercentage = 0;
+        $totalGames = 0;
+        foreach(Player::all() as $player)
+        {
+            $victoriesPercentage += $gameController->getAllGamesFromPlayer($player->id);
+        }
 
+        return json_encode($victoriesPercentage/$gameController->getTotalPlayersWithGames() . '%');
     }
 
     public function showWorst()
     {
-
+        $gameController = new GameController();
+        $playerVictoryPctName = "-";
+        $worstPct = 100;
+        foreach(Player::all() as $player)
+        {
+            $victoriesPercentage = $gameController->getAllGamesFromPlayer($player->id);
+            if($victoriesPercentage < $worstPct && is_numeric($victoriesPercentage))
+            {
+                $worstPct = $victoriesPercentage;
+                $playerVictoryPctName = $player->nickname;
+            }
+        }
+        
+        return json_encode([$playerVictoryPctName, $worstPct]);
     }
 
     public function showBest()
     {
+        $gameController = new GameController();
+        $playerVictoryPctName = "-";
+        $bestPct = 0;
+        foreach(Player::all() as $player)
+        {
+            $victoriesPercentage = $gameController->getAllGamesFromPlayer($player->id);
+            if($victoriesPercentage > $bestPct && is_numeric($victoriesPercentage))
+            {
+                $bestPct = $victoriesPercentage;
+                $playerVictoryPctName = $player->nickname;
+            }
+        }
         
+        return json_encode([$playerVictoryPctName, $bestPct]);
     }
 
     /**
@@ -109,6 +172,12 @@ class PlayerController extends Controller
         // Buscar el jugador por su ID
         //$player = Player::find($id);
         //return response()->json(['playerNickname' => $request->input('nickname')]);
+        $authenticatedPlayer = auth()->user();
+
+        if ($authenticatedPlayer->id != $id) {
+            return response()->json(['error' => 'Access to other player denied.'], 403);
+        }
+
 
         $player = Player::find($id);
 
@@ -158,6 +227,12 @@ class PlayerController extends Controller
 
     public function deleteDice(int $id)
     {
+        $authenticatedPlayer = auth()->user();
+
+        if ($authenticatedPlayer->id != $id) {
+            return response()->json(['error' => 'Access to other player denied.'], 403);
+        }
+
         $gameController = new GameController();
         $gameController->delete($id);
         return response()->json(['response' => "All rows deleted"]);
