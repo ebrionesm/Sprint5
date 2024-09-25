@@ -22,13 +22,13 @@ class RegisterController extends BaseController
         $validator = Validator::make($request->all(), [
             'nickname' => 
                 [
-                    'nullable', /*Rule::unique('players')->where(fn (Builder $query) => $query->where('nickname', 'Anónimo')),*/ 'max:25'
+                    'nullable', 'unique:players',/*Rule::unique('players')->where(fn (Builder $query) => $query->where('nickname', 'Anónimo')),*/ 'max:25'
                 ],
             'email' => 
                 [
                     'required',
+                    'unique:players',
                     //Rule::unique('players')->ignore($player->id),
-                    'email'
                 ],
 
             'role'=>'required|string',
@@ -39,6 +39,8 @@ class RegisterController extends BaseController
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());       
         }
+
+        $request->merge(['nickname' => $request->nickname ?? 'Anonymous']);
      
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);

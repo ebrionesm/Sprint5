@@ -112,7 +112,8 @@ class PlayerController extends Controller
         $totalGames = 0;
         foreach(Player::all() as $player)
         {
-            $victoriesPercentage += $gameController->getAllGamesFromPlayer($player->id);
+            if(is_numeric($gameController->getAllGamesFromPlayer($player->id)))
+                $victoriesPercentage += $gameController->getAllGamesFromPlayer($player->id);
         }
 
         return json_encode($victoriesPercentage/$gameController->getTotalPlayersWithGames() . '%');
@@ -167,11 +168,7 @@ class PlayerController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        //return response()->json(['id' => $id]);
-        
-        // Buscar el jugador por su ID
-        //$player = Player::find($id);
-        //return response()->json(['playerNickname' => $request->input('nickname')]);
+
         $authenticatedPlayer = auth()->user();
 
         if ($authenticatedPlayer->id != $id) {
