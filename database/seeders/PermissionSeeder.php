@@ -14,9 +14,6 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
-            /*'create-player',
-            'edit-player',
-            'delete-player',*/
             'edit-player',
             'view-player',
             'view-game',
@@ -24,12 +21,11 @@ class PermissionSeeder extends Seeder
             'delete-games',
             'view-ranking',
             'view-worst',
-            'view-best'
-         ];
- 
-          // Looping and Inserting Array's Permissions into Permission Table
-         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
-          }
+            'view-best',
+        ];
+        
+        foreach ($permissions as $permission) {
+            Permission::create(['name' => $permission, 'guard_name' => 'web']);
+        }
     }
 }

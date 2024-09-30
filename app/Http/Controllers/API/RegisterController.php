@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
      
 class RegisterController extends BaseController
 {
