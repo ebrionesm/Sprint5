@@ -3,71 +3,104 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\PermissionSeeder;
 use Laravel\Passport\Passport;
 use App\Models\Player;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Artisan;
 
 class RegisterManagementTest extends TestCase
 {
     use RefreshDatabase;
+    protected $player;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Ejecuta las migraciones
-        $this->artisan('migrate');
+        Artisan::call('passport:client --name=<client-name> --no-interaction --personal');
 
-        // Crea el rol y los permisos
-        Role::create(['name' => 'admin', 'guard_name' => 'web']);
-        Permission::create(['name' => 'edit-player', 'guard_name' => 'web']);
-        
-        // Crea un usuario
-        $player = Player::create([
-            'nickname' => 'admin',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('password'), // Asegúrate de que la contraseña esté cifrada
-            'role' => 'admin'
-        ]);
+        $this->artisan('db:seed', ['--class' => PermissionSeeder::class]);
+        $this->artisan('db:seed', ['--class' => RoleSeeder::class]);
 
-        // Asigna el rol al usuario
-        $player->assignRole('admin');
-
-        // Inicia sesión con el token de acceso personal
-        Passport::actingAs($player, 'web');
     }
+
     /**
      * A basic feature test example.
      */
-    public function test_example(): void
+    public function test_player_register(): void
     {
-        // Crea un usuario
-        $user = Player::create([
-            'nickname' => 'admin2',
-            'email' => 'admin2@example.com',
-            'password' => bcrypt('12345678'), // Asegúrate de que la contraseña esté cifrada
+        $this->withoutExceptionHandling();
+
+        $nickname = 'player';
+        $email = 'player@gmail.com';
+
+        $response = $this->post('api/players', [
+            'nickname' => $nickname,
+            'email' => $email,
+            'password' => 'password',
+            'role' => 'player'
+        ]);
+
+        $response->assertStatus(200);
+
+        $player = Player::where('nickname', $nickname)->first();
+
+        $this->assertNotNull($player);
+        $this->assertEquals($player->nickname, $nickname);
+        $this->assertEquals($player->email, $email);
+        $this->assertEquals($player->role, 'player');
+    }
+
+    public function test_admin_register(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $nickname = 'EL admin';
+        $email = 'admin@gmail.com';
+
+        $response = $this->post('api/players', [
+            'nickname' => $nickname,
+            'email' => $email,
+            'password' => 'password',
             'role' => 'admin'
         ]);
 
-        // Asigna el rol al usuario
-        $user->assignRole('admin');
+        $response->assertStatus(200);
 
-        // Simula el inicio de sesión
-        $this->actingAs($user);
+        $player = Player::where('nickname', $nickname)->first();
 
-        // Realiza la solicitud POST
-        $data = [
-            'nickname' => 'The Player',
-            'email' => 'player@gmail.com',
-            'password' => '1234',
-            'role' => 'admin',
-        ];
+        $this->assertNotNull($player);
+        $this->assertEquals($player->nickname, $nickname);
+        $this->assertEquals($player->email, $email);
+        $this->assertEquals($player->role, 'admin');
+    }
 
-        $response = $this->post('/players', $data);
+    public function test_guest_register(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $email = 'guest@gmail.com';
+
+        $response = $this->post('api/players', [
+            'nickname' => NULL,
+            'email' => $email,
+            'password' => 'password',
+            'role' => 'player'
+        ]);
 
         $response->assertStatus(200);
-        }
+
+        $player = Player::where('email', $email)->first();
+
+        $this->assertNotNull($player);
+        $this->assertEquals($player->nickname, 'Anonymous');
+        $this->assertEquals($player->email, $email);
+        $this->assertEquals($player->role, 'player');
+    }
+
+    
 }

@@ -17,7 +17,7 @@ class PlayerController extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**
@@ -182,25 +182,19 @@ class PlayerController extends Controller
         {
             return response()->json(['message' => 'Player not found'], 404);
         }
-        //dd(json_decode($request->getContent(), true));
-        // Obtener el valor de 'nickname' del request
-        //return response()->json(['request' => $request]);
-        //$nickname = $request->input('nickname');
+        
         $nickname = $request->json('nickname');
         
 
         // Si el valor de nickname no es proporcionado
         if (!$nickname) 
         {
-            return response()->json(['message' => 'Nickname is required'], 400);
+            $nickname = 'Anonymous';
         }
 
         // Validar y actualizar los datos del jugador
         $validatedData = $request->validate([
             'nickname' => 'required|string|min:3|max:25',
-            /*'email' => 'required|string',
-            'password' => 'required|string',
-            'role' => 'required', /*Rule::in(['admin', 'player'])],*/
         ]);
         
 
