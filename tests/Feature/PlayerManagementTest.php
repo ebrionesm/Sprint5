@@ -19,7 +19,7 @@ class PlayerManagementTest extends TestCase
     use RefreshDatabase;
     protected $player;
     protected $otherPlayer;
-
+    // php artisan test --env=testing SE ME OLVIDA CADA DÍA :)
     protected function setUp(): void
     {
         parent::setUp();
@@ -36,6 +36,8 @@ class PlayerManagementTest extends TestCase
             'role' => 'player'
         ]);
 
+        $this->player->assignRole('player');
+
         $this->admin = Player::factory()->create([
             'nickname' => 'admin',
             'email' => 'admin@gmail.com',
@@ -43,12 +45,16 @@ class PlayerManagementTest extends TestCase
             'role' => 'admin'
         ]);
 
+        $this->admin->assignRole('admin');
+
         $this->otherPlayer = Player::factory()->create([
             'nickname' => 'otherPlayer',
             'email' => 'otherPlayer@gmail.com',
             'password' => Hash::make('password'),
             'role' => 'player'
         ]);
+
+        $this->otherPlayer->assignRole('player');
 
     }
 
@@ -158,6 +164,94 @@ class PlayerManagementTest extends TestCase
 
         $response->assertStatus(200);
 
+        $response->assertJsonStructure([
+            '*' => ['nickname', 'victoryPercentage']
+        ]);
+
+        $response->assertJsonFragment([
+            'nickname' => 'player',
+            'victoryPercentage' => '-%'
+        ]);
+
+        $response->assertJsonFragment([
+            'nickname' => 'admin',
+            'victoryPercentage' => '-%'
+        ]);
+
+        $response->assertJsonFragment([
+            'nickname' => 'otherPlayer',
+            'victoryPercentage' => '-%'
+        ]);
+
+        $response->assertJsonMissing([
+            'nickname' => 'patata',
+            'victoryPercentage' => '100%'
+        ]);
+
+        $response->assertJsonMissing([
+            'nickname' => 'patata'
+        ]);
+
+    }
+
+    public function test_player_cant_see_all_players()
+    {
+        $token = $this->player->createToken('playerToken')->accessToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get("api/players");
+
+        $response->assertStatus(403);
+    }
+
+    public function test_player_can_see_their_own_games()
+    {
+
+        $token = $this->player->createToken('playerToken')->accessToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->post("api/players/{$this->player->id}/games");
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get("api/players/{$this->player->id}/games");
+
+        $response->assertStatus(200);
+        
+        /*$responseData = $response->json();
+        //dd($responseData);
+
+        $response->assertJsonStructure([
+            '*' => ['id', 'dieOne', 'dieTwo', 'result', 'id_player']
+        ]);*/
+    }
+
+    public function test_player_cant_see_other_players_games()
+    {
+        $token = $this->otherPlayer->createToken('playerToken')->accessToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->post("api/players/{$this->player->id}/games");
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get("api/players/{$this->player->id}/games");
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_see_ranking()
+    {
+        $token = $this->admin->createToken('adminToken')->accessToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get("api/players/ranking");
+
+        $response->assertStatus(200);
     }
 
     

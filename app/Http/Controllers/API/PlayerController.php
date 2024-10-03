@@ -79,7 +79,11 @@ class PlayerController extends Controller
         foreach(Player::all() as $player)
         {
             $victoriesPercentage = $gameController->getAllGamesFromPlayer($player->id);
-            $playerVictoryPct[$player->nickname] = $victoriesPercentage . '%';
+            $playerVictoryPct[] = [
+                'nickname' => $player->nickname,
+                'victoryPercentage' => $victoriesPercentage . '%'
+            ];
+            //$playerVictoryPct[$player->nickname] = $victoriesPercentage . '%';
             //echo $victoriesPercentage . " ";
         }
         
@@ -91,10 +95,7 @@ class PlayerController extends Controller
         $authenticatedPlayer = auth()->user();
 
         if ($authenticatedPlayer->id != $id) {
-            // Comprobar si el usuario autenticado es un administrador
-            if (!$authenticatedPlayer->hasRole('admin')) { // Usa el método correspondiente según tu implementación de roles
-                return response()->json(['error' => 'Access to other player denied.'], 403);
-            }
+            return response()->json(['error' => 'Access to other player denied.'], 403);
         }
 
         $gameController = new GameController();

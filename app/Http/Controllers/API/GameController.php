@@ -77,7 +77,7 @@ class GameController extends Controller
     {
         $games = Game::where('id_player', '=', $id)->get();
 
-        return response()->json([$games]);
+        return response()->json($games); 
     }
 
     public function getTotalPlayersWithGames()
