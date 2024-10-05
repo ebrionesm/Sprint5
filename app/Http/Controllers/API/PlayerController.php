@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Player;
+use App\Models\Game;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\API\GameController;
 use App\Http\Requests\StorePlayerRequest;
@@ -116,14 +117,17 @@ class PlayerController extends Controller
             if(is_numeric($gameController->getAllGamesFromPlayer($player->id)))
                 $victoriesPercentage += $gameController->getAllGamesFromPlayer($player->id);
         }
-
-        return json_encode($victoriesPercentage/$gameController->getTotalPlayersWithGames() . '%');
+        if(Player::count() > 0 && Game::count() > 0)
+            return json_encode($victoriesPercentage/$gameController->getTotalPlayersWithGames() . '%');
+        else
+            return response()->json(['error' => 'No players or games in the database.'], 204);
     }
 
     public function showWorst()
     {
         $gameController = new GameController();
         $playerVictoryPctName = "-";
+        $playerVictoryPct = [];
         $worstPct = 100;
         foreach(Player::all() as $player)
         {
@@ -131,29 +135,39 @@ class PlayerController extends Controller
             if($victoriesPercentage < $worstPct && is_numeric($victoriesPercentage))
             {
                 $worstPct = $victoriesPercentage;
-                $playerVictoryPctName = $player->nickname;
+                //$playerVictoryPctName = $player->nickname;
+                $playerVictoryPct[] = [
+                    'nickname' => $player->nickname,
+                    'victoryPercentage' => $worstPct . '%'
+                ];
             }
         }
         
-        return json_encode([$playerVictoryPctName, $worstPct]);
+        //return json_encode([$playerVictoryPctName, $worstPct]);
+        return json_encode($playerVictoryPct);
     }
 
     public function showBest()
     {
         $gameController = new GameController();
         $playerVictoryPctName = "-";
+        $playerVictoryPct = [];
         $bestPct = 0;
         foreach(Player::all() as $player)
         {
             $victoriesPercentage = $gameController->getAllGamesFromPlayer($player->id);
-            if($victoriesPercentage > $bestPct && is_numeric($victoriesPercentage))
+            if($victoriesPercentage >= $bestPct && is_numeric($victoriesPercentage))
             {
                 $bestPct = $victoriesPercentage;
-                $playerVictoryPctName = $player->nickname;
+                //$playerVictoryPctName = $player->nickname;
+                $playerVictoryPct[] = [
+                    'nickname' => $player->nickname,
+                    'victoryPercentage' => $bestPct . '%'
+                ];
             }
         }
         
-        return json_encode([$playerVictoryPctName, $bestPct]);
+        return json_encode($playerVictoryPct);
     }
 
     /**

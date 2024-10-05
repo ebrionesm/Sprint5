@@ -18,6 +18,7 @@ class PlayerManagementTest extends TestCase
 {
     use RefreshDatabase;
     protected $player;
+    protected $admin;
     protected $otherPlayer;
     // php artisan test --env=testing SE ME OLVIDA CADA DÍA :)
     protected function setUp(): void
@@ -243,7 +244,7 @@ class PlayerManagementTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_admin_can_see_ranking()
+    public function test_admin_can_see_ranking_empty_db()
     {
         $token = $this->admin->createToken('adminToken')->accessToken;
 
@@ -251,7 +252,95 @@ class PlayerManagementTest extends TestCase
             'Authorization' => 'Bearer ' . $token,
         ])->get("api/players/ranking");
 
+        $response->assertStatus(204);
+    }
+
+    public function test_admin_can_see_ranking()
+    {
+        Game::factory()->create([
+            'id_player' => $this->player->id,
+        ]);
+
+        $token = $this->admin->createToken('adminToken')->accessToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get("api/players/ranking");
+
         $response->assertStatus(200);
+    }
+
+    public function test_player_cant_see_ranking()
+    {
+        $token = $this->player->createToken('playerToken')->accessToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get("api/players/ranking");
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_see_worst_player()
+    {
+        Game::factory()->create([
+            'id_player' => $this->player->id,
+        ]);
+
+        $token = $this->admin->createToken('adminToken')->accessToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get("api/players/ranking/loser");
+
+        $response->assertStatus(200);
+
+        $response->assertJsonFragment([
+            'nickname' => 'player',
+            //'victoryPercentage' => '-%'
+        ]);
+    }
+
+    public function test_player_cant_see_worst_player()
+    {
+        $token = $this->player->createToken('playerToken')->accessToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get("api/players/ranking/loser");
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_see_best_player()
+    {
+        Game::factory()->create([
+            'id_player' => $this->player->id,
+        ]);
+
+        $token = $this->admin->createToken('adminToken')->accessToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get("api/players/ranking/winner");
+
+        $response->assertStatus(200);
+
+        $response->assertJsonFragment([
+            'nickname' => 'player',
+            //'victoryPercentage' => '-%'
+        ]);
+    }
+
+    public function test_player_cant_see_best_player()
+    {
+        $token = $this->player->createToken('playerToken')->accessToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get("api/players/ranking/winner");
+
+        $response->assertStatus(403);
     }
 
     

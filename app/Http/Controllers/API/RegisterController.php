@@ -32,7 +32,7 @@ class RegisterController extends BaseController
                     //Rule::unique('players')->ignore($player->id),
                 ],
 
-            'role'=>'required|string',
+            //'role'=>'required|string',
             'password' => 'required',
             /*'c_password' => 'required|same:password',*/
         ]);
@@ -46,7 +46,8 @@ class RegisterController extends BaseController
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $player = Player::create($input);
-        $player->assignRole($request->input('role', 'api'));
+        //$player->assignRole($request->input('role', 'api'));
+        $player->assignRole($player->role);
         $player->save();
         $success['token'] =  $player->createToken('dicegame')->accessToken;
         $success['name'] =  $player->nickname;

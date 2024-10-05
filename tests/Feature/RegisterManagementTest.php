@@ -42,7 +42,7 @@ class RegisterManagementTest extends TestCase
             'nickname' => $nickname,
             'email' => $email,
             'password' => 'password',
-            'role' => 'player'
+            //'role' => 'player'
         ]);
 
         $response->assertStatus(200);
