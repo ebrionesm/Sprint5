@@ -22,6 +22,7 @@ class LoginManagementTest extends TestCase
     {
         parent::setUp();
 
+        Artisan::call('passport:keys --force');
         Artisan::call('passport:client --name=<client-name> --no-interaction --personal');
 
         $this->artisan('db:seed', ['--class' => PermissionSeeder::class]);
