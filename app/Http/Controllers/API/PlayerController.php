@@ -221,8 +221,16 @@ class PlayerController extends Controller
         
 
         // Actualizar los campos
-        $player->nickname = $validatedData['nickname'];
-        $player->save();
+        if($player->nickname != $validatedData['nickname'])
+        {
+            $player->nickname = $validatedData['nickname'];
+            $player->save();
+        }
+        else
+        {
+            return response()->json(['message' => 'The new nickname has to be diffent']);
+        }
+            
 
         // Retornar una respuesta de éxito
         return response()->json([

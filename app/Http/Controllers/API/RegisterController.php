@@ -42,7 +42,7 @@ class RegisterController extends BaseController
         }
 
         $request->merge(['nickname' => $request->nickname ?? 'Anonymous']);
-     
+        $request->merge(['role' => 'player']);
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $player = Player::create($input);
